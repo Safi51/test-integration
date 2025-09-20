@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel_app
+        volumes:
+            - .:/app
+            - ./php-conf/memory.ini:/usr/local/etc/php/conf.d/memory.ini
+            - ./supervisor/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf
+        ports:
+            - "8000:80"
+        depends_on:
+            - mysql
+        environment:
+            APP_ENV: ${APP_ENV}
+            APP_URL: ${APP_URL}
+            SESSION_DRIVER: ${SESSION_DRIVER}
+            APP_DEBUG: ${APP_DEBUG}
+            DB_HOST: ${DB_HOST}
+            DB_DATABASE: ${DB_DATABASE}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            VERIFICATION_KEY: ${VERIFICATION_KEY}
+            INTEGRATION_TEST_URL: ${INTEGRATION_TEST_URL}
+            LOG_CHANNEL: ${LOG_CHANNEL}
+            QUEUE_CONNECTION: ${QUEUE_CONNECTION}
+
+    mysql:
+        image: mysql:8.0
+        container_name: laravel_mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            TZ: ${TZ}
+        volumes:
+            - mysql_data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+
+    adminer:
+        image: adminer:latest
+        container_name: laravel_adminer
+        ports:
+            - "8080:8080"
+        depends_on:
+            - mysql
+volumes:
+    mysql_data:
