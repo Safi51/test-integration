@@ -3,10 +3,6 @@
 namespace App\Jobs;
 
 use App\Helpers\TestIntegration;
-use App\Models\Income;
-use App\Models\Order;
-use App\Models\Sale;
-use App\Models\Stock;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
@@ -15,11 +11,12 @@ use Illuminate\Support\Facades\Log;
 class SendRequestTestIntegrationDispatch implements ShouldQueue
 {
     use Queueable;
+
     protected string $url;
     protected string $route;
     protected array $date;
     protected string $limit;
-//    protected $model;
+    protected string $model;
 
     public function __construct(string $route, array $date, string $limit)
     {
@@ -27,12 +24,10 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
         $this->route = $route;
         $this->date = $date;
         $this->limit = $limit;
-//        $this->model = TestIntegration::getModel($route);
     }
 
     public function handle(): void
     {
-        Log::info('s', [$this->url, $this->route, $this->date, $this->limit]);
         $page = 1;
         $lastPage = 2;
         do{
@@ -59,20 +54,8 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
                 break;
             }
             $res = $res->json();
-            switch ($this->route){
-                case Order::INTEGRATION_TEST:
-                    Order::insert($res['data']);
-                    break;
-                case Sale::INTEGRATION_TEST:
-                    Sale::insert($res['data']);
-                    break;
-                case Income::INTEGRATION_TEST:
-                    Income::insert($res['data']);
-                    break;
-                case Stock::INTEGRATION_TEST:
-                    Stock::insert($res['data']);
-                    break;
-            }
+
+            TestIntegration::getClass($this->route)::insert($res['data']);
 
             $lastPage = $res['meta']['last_page'];
             $page++;

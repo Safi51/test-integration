@@ -20,7 +20,8 @@ class ImportApiDataCommand extends Command
      * @description
      *  - limit = сколько записей покажет один запрос. Максимум может быть 500
      */
-    protected $signature = 'test:integration {limit?}';
+//    protected $signature = 'test:integration {limit?}';
+    protected $signature = 'hello {limit?}';
 
     /** @var string */
     protected $description = 'Импортирование данных тестового задания от компании  "Ельмикеев аналитика"';
@@ -29,11 +30,13 @@ class ImportApiDataCommand extends Command
     {
         $this->comment('Начало импортирование');
         foreach ($this->routes as $route) {
+            $this->info("Обрабатывается маршрут: {$route}");
             $dateFrom = $route === Stock::INTEGRATION_TEST
                 ? Carbon::now()->subDay()->format('Y-m-d')
                 : '2024-01-01';
                $limit =  $this->argument('limit') ?? '500';
 
+            $this->line("  • Дата начала: {$dateFrom}, лимит: {$limit}");
 
             $startDate = Carbon::parse($dateFrom);
             $now       = Carbon::now();
@@ -55,6 +58,7 @@ class ImportApiDataCommand extends Command
                 ];
             }
             foreach ($dates as $date) {
+                $this->line('  • Отправка в очередь для получение данных');
                 SendRequestTestIntegrationDispatch::dispatch($route, $date, $limit);
             }
         }
