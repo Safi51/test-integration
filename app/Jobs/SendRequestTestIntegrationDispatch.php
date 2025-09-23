@@ -45,8 +45,7 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
                 'limit'    => $this->limit,
                 'page'     => $page,
             ]);
-            Log::info($res->body());
-            Log::info($res->status());
+
             if ($res->status() === 429){
                 Log::info('wtf');
                 $retryAfter = $res->header('Retry-After', 7);

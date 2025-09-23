@@ -1,15 +1,16 @@
 version: '3.8'
 
 services:
-    app:
+    php:
         build:
             context: .
             dockerfile: Dockerfile
-        container_name: laravel_app
+        container_name: php
         volumes:
             - .:/app
             - ./php-conf/memory.ini:/usr/local/etc/php/conf.d/memory.ini
             - ./supervisor/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf
+            - ./supervisor/laravel-cron.conf:/etc/supervisor/conf.d/laravel-cron.conf
         ports:
             - "8000:80"
         depends_on:
@@ -30,7 +31,7 @@ services:
 
     mysql:
         image: mysql:8.0
-        container_name: laravel_mysql
+        container_name: mysql
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${DB_DATABASE}
@@ -40,7 +41,7 @@ services:
         volumes:
             - mysql_data:/var/lib/mysql
         ports:
-            - "3306:3306"
+            - "3307:3306"
 
     adminer:
         image: adminer:latest
