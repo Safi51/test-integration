@@ -11,6 +11,8 @@ class Sale extends Model
 
     const INTEGRATION_TEST = 'sales';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'g_number',
         'date',
@@ -39,5 +41,6 @@ class Sale extends Model
         'category',
         'brand',
         'is_storno',
+        'account_id'
     ];
 }

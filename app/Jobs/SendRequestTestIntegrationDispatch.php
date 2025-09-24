@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Helpers\TestIntegration;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
@@ -17,13 +18,15 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
     protected array $date;
     protected string $limit;
     protected string $model;
+    protected int $accountId;
 
-    public function __construct(string $route, array $date, string $limit)
+    public function __construct(string $route, array $date, string $limit, int $accountId)
     {
         $this->url = 'http://' . config('services.integration.test') . ':6969/api/';
         $this->route = $route;
         $this->date = $date;
         $this->limit = $limit;
+        $this->accountId = $accountId;
     }
 
     public function handle(): void
@@ -31,6 +34,7 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
         $page = 1;
         $lastPage = 2;
         do{
+            Log::info('  • получение данных обновление либо сохранение ' . $this->route . ' страницы: ' . $page);
             $res = Http::withHeaders([
                 'Content-Type' => 'application/json',
             ])->get($this->url . $this->route, [
@@ -42,7 +46,7 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
             ]);
 
             if ($res->status() === 429){
-                Log::info('wtf');
+                Log::info('Ошибка 429: Too many requests. Код уходить  спать на 7 сек');
                 $retryAfter = $res->header('Retry-After', 7);
 
                 sleep($retryAfter);
@@ -50,15 +54,28 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
             }
             if (!$res->successful()){
                 Log::channel('failed_integration')
-                    ->info('Ошибка при тестовой интеграции orders на странице: ' . $page, $res->json() ?? []);
+                    ->info('Ошибка при тестовой интеграции orders на странице: ' . $page,
+                        $res->json() ?? []);
                 break;
             }
             $res = $res->json();
 
-            TestIntegration::getClass($this->route)::insert($res['data']);
+            $uniques = TestIntegration::getUnique($this->route);
+            $class = TestIntegration::getClass($this->route);
 
+            $uniqueData = [];
+            foreach ($res['data'] as $item) {
+               $data = array_merge($item, ['account_id' => $this->accountId]);
+
+               foreach ($uniques as $unique) {
+                   $uniqueData[$unique] = $data[$unique] ?? null;
+               }
+               $class::updateOrCreate($uniqueData, $data);
+            }
             $lastPage = $res['meta']['last_page'];
             $page++;
         }while ($page <= $lastPage);
+
+        Log::info('конец эскпортирование ' . $this->route);
     }
 }
