@@ -14,15 +14,15 @@ class ImportApiDataCommand extends Command
 {
     protected $routes = [
         'orders',
-//        'sales',
-//        'incomes',
-//        'stocks',
+        'sales',
+        'incomes',
+        'stocks',
     ];
     /**
      * @var string
      * @description
      *  - limit = сколько записей покажет один запрос. Максимум может быть 500
-     *  - all если поставить true тогда сработает с 2024-01-01
+     *  - dateFrom дата если нету то ставить сегодняшней даты -1 день
      */
 //    protected $signature = 'test:integration {limit?}';
     protected $signature = 'hello {dateFrom?} {limit?}';
@@ -53,6 +53,7 @@ class ImportApiDataCommand extends Command
                 return $token->api_service_id === $apiService->id
                     || in_array($token->type_slug, $availableTokenTypes);
             })->first();
+
             if (!$token) {
                 Log::info('не нашел токен для верификации');
                 return;
@@ -60,7 +61,7 @@ class ImportApiDataCommand extends Command
 
             foreach ($this->routes as $route) {
                 Log::info("Обрабатывается маршрут: {$route}");
-                $dateFrom = $this->argument('dateFrom') !== null
+                $dateFrom = $this->argument('dateFrom') !== null || $route !== Stock::INTEGRATION_TEST
                     ? Carbon::parse($this->argument('dateFrom'))->format('Y-m-d')
                     : Carbon::now()->subDay()->format('Y-m-d');
 

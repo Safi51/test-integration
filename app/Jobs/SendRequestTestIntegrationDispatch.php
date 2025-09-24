@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Helpers\TestIntegration;
-use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
@@ -63,14 +62,16 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
             $uniques = TestIntegration::getUnique($this->route);
             $class = TestIntegration::getClass($this->route);
 
-            $uniqueData = [];
             foreach ($res['data'] as $item) {
-               $data = array_merge($item, ['account_id' => $this->accountId]);
-
-               foreach ($uniques as $unique) {
+                $data = array_merge($item, ['account_id' => $this->accountId]);
+                $uniqueData = [];
+                foreach ($uniques as $unique) {
                    $uniqueData[$unique] = $data[$unique] ?? null;
-               }
-               $class::updateOrCreate($uniqueData, $data);
+                }
+
+                $uniqueData['account_id'] = $this->accountId;
+                Log::info($uniqueData);
+                $class::updateOrCreate($uniqueData, $data);
             }
             $lastPage = $res['meta']['last_page'];
             $page++;
