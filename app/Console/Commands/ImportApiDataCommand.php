@@ -24,7 +24,7 @@ class ImportApiDataCommand extends Command
      *  - limit = сколько записей покажет один запрос. Максимум может быть 500
      *  - dateFrom дата если нету то ставить сегодняшней даты -1 день
      */
-    protected $signature = 'test:integration {limit?}';
+    protected $signature = 'test:integration {dateFrom?} {limit?}';
 
     /** @var string */
     protected $description = 'Импортирование данных тестового задания от компании  "Ельмикеев аналитика"';
