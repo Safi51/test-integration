@@ -26,7 +26,7 @@
 - **DB_USERNAME: q70192e7_safi**
 - **DB_PASSWORD: l@ravel_safi51**
 
-## Начало рабоыт с проектом
+## Начало работы с проектом
 - **создать .env и взять данные с .env.example**
 - **Вставить VERIFICATION_KEY который мне отправили**
 - **Написать в консоль docker compose up -d**
