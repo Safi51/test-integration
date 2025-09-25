@@ -60,9 +60,9 @@ class ImportApiDataCommand extends Command
 
             foreach ($this->routes as $route) {
                 Log::info("Обрабатывается маршрут: {$route}");
-                $dateFrom = $this->argument('dateFrom') !== null || $route !== Stock::INTEGRATION_TEST
+                $dateFrom = $this->argument('dateFrom') !== null && $route !== Stock::INTEGRATION_TEST
                     ? Carbon::parse($this->argument('dateFrom'))->format('Y-m-d')
-                    : Carbon::now()->subDay()->format('Y-m-d');
+                    : Carbon::now()->format('Y-m-d');
 
                 $limit =  $this->argument('limit') ?? '500';
 

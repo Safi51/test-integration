@@ -52,8 +52,9 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
                 continue;
             }
             if (!$res->successful()){
+                Log::info('при получение данных ' . $this->route . ' вышла ошибка смотрите в storage/logs/failed-integration');
                 Log::channel('failed_integration')
-                    ->info('Ошибка при тестовой интеграции orders на странице: ' . $page,
+                    ->info('Ошибка при тестовой интеграции' . $this->route . 'на странице: ' . $page,
                         $res->json() ?? []);
                 break;
             }
@@ -70,7 +71,6 @@ class SendRequestTestIntegrationDispatch implements ShouldQueue
                 }
 
                 $uniqueData['account_id'] = $this->accountId;
-                Log::info($uniqueData);
                 $class::updateOrCreate($uniqueData, $data);
             }
             $lastPage = $res['meta']['last_page'];
