@@ -28,7 +28,7 @@
 
 ## Начало работы с проектом
 - **создать .env и взять данные с .env.example**
-- **Вставить VERIFICATION_KEY=E6kUTYrYwZq2tN4QEtyzsbEBk3ie который мне отправили и MYSQL_ROOT_PASSWORD, DB_PASSWORD**
+- **Вставить VERIFICATION_KEY который мне отправили и MYSQL_ROOT_PASSWORD, DB_PASSWORD**
 - **Написать в консоль docker compose up -d**
 - **Для засеевание данных в консоле: php artisan db:seed**
 - **Для получение данных с апи серверов test:integration. У команды есть флажки для изменения вариации**
